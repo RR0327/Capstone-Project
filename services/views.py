@@ -3,11 +3,15 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from datetime import date
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
 
 from .models import (
+    User,
     CafeteriaMenu, 
     BusRoute, 
-    BusSchedule,
+    bus_schedule,
     Faculty, 
     Course, 
     ClassSchedule, 
@@ -22,7 +26,7 @@ def index(request):
 # ---------------------
 # Authentication Views
 # ---------------------
-def user_login(request):
+def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -33,6 +37,54 @@ def user_login(request):
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     return render(request, 'login.html')
+
+def register_view(request):
+    """
+    Handles user registration and automatically generates a Card with a QR code.
+    """
+    if request.method == 'POST':
+        name = request.POST.get('name').strip()
+        email = request.POST.get('email').strip()
+        role = request.POST.get('role')
+        password = request.POST.get('password')
+        id_number = request.POST.get('id_number').strip()
+        level = request.POST.get('level') if role == 'student' else None
+        term = request.POST.get('term') if role == 'student' else None
+        contact_information = request.POST.get('contact_information').strip()
+        
+        if not all([name, email, role, password, id_number, contact_information]):
+            messages.error(request, "All fields are required.")
+            return redirect('register')
+        
+        if role == 'student' and not all([level, term]):
+            messages.error(request, "Level and Term are required for students.")
+            return redirect('register')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "This email is already registered.")
+            return redirect('register')
+
+        if User.objects.filter(id_number=id_number).exists():
+            messages.error(request, "This ID number is already registered.")
+            return redirect('register')
+        
+        try:
+            user = User.objects.create_user(
+                email=email, name=name, role=role,
+                id_number=id_number, level=level, term=term,
+                contact_information=contact_information, password=password
+            )
+            # Card.objects.create(user=user)
+            messages.success(request, "Registration successful! You can now log in.")
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, f"Error during registration: {str(e)}")
+            return redirect('register')
+    
+    return render(request, 'register.html')
+
+
+
 
 def user_logout(request):
     logout(request)
@@ -55,7 +107,7 @@ def cafeteria_view(request):
 # ---------------------
 def bus_schedules_view(request):
     routes = BusRoute.objects.all()
-    schedules = BusSchedule.objects.all()
+    schedules = bus_schedule.objects.all()
     context = {
         'routes': routes,
         'schedules': schedules

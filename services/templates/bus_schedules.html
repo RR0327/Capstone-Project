@@ -1,18 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
+<!-- or your main layout template, e.g. transport_app/base.html -->
+
+{% load static %}
+
 {% block content %}
-<h2>Bus Routes & Schedules</h2>
-<h3>Routes</h3>
-<ul>
-    {% for route in routes %}
-    <li>{{ route.route_name }}: {{ route.start_location }} to {{ route.end_location }}</li>
+  <h1>Bus Schedule</h1>
+  
+  {% if bus_schedules %}
+    {% for schedule in bus_schedules %}
+      <div class="schedule-item">
+        <h2>{{ schedule.title }}</h2>
+        <p>{{ schedule.description }}</p>
+        <p>Date: {{ schedule.date }}</p>
+        <p>Time: {{ schedule.time }}</p>
+        <p>Last Updated: {{ schedule.updated_at }}</p>
+      </div>
+      <hr>
     {% endfor %}
-</ul>
-<h3>Schedules</h3>
-<ul>
-    {% for schedule in schedules %}
-    <li>{{ schedule.route.route_name }}:
-        Departs at {{ schedule.departure_time }},
-        Arrives at {{ schedule.arrival_time }}</li>
-    {% endfor %}
-</ul>
-{% endblock %}
+  {% else %}
+    <p>No bus schedules available at the moment.</p>
+  {% endif %}
+{% endblock content %}
