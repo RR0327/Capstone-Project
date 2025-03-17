@@ -76,7 +76,7 @@ All-In-One-University/
 ```
 
 ## Contributor
-Md Tahsin Azad Shaikat
+Dipa Barua, Md Tahsin Azad Shaikat, Mafid Bin Mizan
 
 ## Contributing
 Feel free to contribute! Fork the repository, make changes, and submit a pull request.
