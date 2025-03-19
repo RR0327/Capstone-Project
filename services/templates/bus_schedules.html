@@ -1,0 +1,23 @@
+{% extends 'base.html' %} 
+<!-- or your main layout template, e.g. transport_app/base.html -->
+
+{% load static %}
+
+{% block content %}
+  <h1>Bus Schedule</h1>
+  
+  {% if bus_schedules %}
+    {% for schedule in bus_schedules %}
+      <div class="schedule-item">
+        <h2>{{ schedule.title }}</h2>
+        <p>{{ schedule.description }}</p>
+        <p>Date: {{ schedule.date }}</p>
+        <p>Time: {{ schedule.time }}</p>
+        <p>Last Updated: {{ schedule.updated_at }}</p>
+      </div>
+      <hr>
+    {% endfor %}
+  {% else %}
+    <p>No bus schedules available at the moment.</p>
+  {% endif %}
+{% endblock content %}
