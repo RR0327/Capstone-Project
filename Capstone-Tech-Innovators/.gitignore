@@ -19,10 +19,13 @@ desktop.ini
 # --- Media & Research Data ---
 # Ignores the folders and all nested content
 
-videos/
 dataset/
 RoboFlow/
-Download_Images/
+clean_frames/
+dataset/
+dataset_small/
+frames/
+videos/
 
 # --- Model Weights ---
 # Prevents large binary files from bloating your Git history
