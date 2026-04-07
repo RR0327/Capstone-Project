@@ -397,6 +397,41 @@ which is 100% the correct move.
 
 - Full dataset (30K+) → Final training
 
+> Bonus Optimization (IMPORTANT for CPU)
+
+Update DataLoader:
+
+```python
+train_loader = DataLoader(
+train_dataset,
+batch_size=16, # increase batch size
+shuffle=True,
+num_workers=0 # safer on Windows
+)
+```
+
+> Why:
+
+- num_workers=0 → avoids multiprocessing issues
+
+- batch_size=16 → fewer iterations → faster
+
+> Pro Tip (VERY IMPORTANT)
+
+Right now your loss is:
+
+        going to 0.0001 VERY FAST
+
+This might mean:
+
+- Dataset is too easy
+- OR model is overfitting
+
+We’ll fix that later with:
+
+- Validation set
+- Data augmentation
+
 > Final pipeline will look like:
 
 ```bash
