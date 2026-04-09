@@ -432,6 +432,156 @@ We’ll fix that later with:
 - Validation set
 - Data augmentation
 
+> Train + Validation
+
+> Accuracy tracking
+
+> Overfitting protection (basic)
+
+> Safe for Windows (no multiprocessing crash)
+
+> Optimized for CPU
+
+- Based on the above topic code the output is:
+
+        Training Completed!
+        Best Validation Accuracy: 92.66%
+
+> From your logs:
+
+- Loss ≈ 0.0001 very fast
+
+This usually means:
+
+- Model memorizing dataset (overfitting)
+
+> Right now you moved from:
+
+        beginner setup → real ML workflow
+
+That’s a big jump.
+
+> What You Should Watch
+
+After each epoch:
+
+- Loss ↓
+- Accuracy ↑
+
+> Case 1:
+
+        Loss very low but accuracy low
+
+Overfitting
+
+> Case 2:
+
+        Accuracy ~50%
+
+Model not learning
+
+> Right now you’ve built:
+
+        A real-world AI classification pipeline
+
+Not beginner level anymore.
+
+> 1. Overfitting Protection (Data Augmentation)
+
+> Important:
+
+- Augmentation = ONLY for training
+- DO NOT use it in validation
+
+> 2. Windows Stability Fix
+
+```python
+
+(A) num_workers=0   # Inside the DataLoader (both train_loader and val_loader)
+
+Why:
+
+- Prevents crash on Windows
+- Uses single process (safe for you)
+
+(B) if __name__ == "__main__":
+WHERE to add:
+
+VERY IMPORTANT — at the bottom of your file
+
+Structure:
+
+def main():
+    # all the code here
+    pass
+
+
+# -----------------------------
+# Windows Fix (MUST HAVE)
+# -----------------------------
+if __name__ == "__main__":
+    main()
+```
+
+## After then Final Structure:
+
+```python
+imports
+↓
+def main():
+device
+transforms (WITH augmentation)
+dataset
+dataloader (num_workers=0)
+model
+training loop
+↓
+if __name__ == "__main__":
+main()
+```
+
+> Simple Explanation (So u can
+> Never Forget)
+
+```bash
+- RandomHorizontalFlip / Rotation
+“Make dataset more diverse”
+
+- num_workers=0
+“Don’t use multiprocessing (safe mode)”
+
+- if name == "main":
+“Start program safely on Windows”
+
+```
+
+> Final Answer
+
+- Add augmentation → inside train transforms
+- Add num_workers=0 → inside DataLoader
+- Add main guard → bottom of file
+
+> Current update based on the above is EXCELLENT.
+
+> What Your Output Means
+
+        Good Signs:
+
+- Validation Accuracy reached ~92.66%
+- Training loss is decreasing
+- Model is learning properly
+
+        Small Warning:
+
+- Accuracy dropped in Epoch 3 → 81%
+- Then recovered → 91%
+
+        This means:
+
+- Model is slightly unstable / small dataset noise
+
+But this is normal for 500–1000 images.
+
 > Final pipeline will look like:
 
 ```bash
