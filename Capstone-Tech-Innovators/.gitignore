@@ -19,6 +19,7 @@ desktop.ini
 # --- Media & Research Data ---
 # Ignores the folders and all nested content
 
+RoboFlow/
 Momo_Hut/
 momo_hut_frames/
 clean_data/
