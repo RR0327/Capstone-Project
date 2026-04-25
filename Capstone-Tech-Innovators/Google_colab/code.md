@@ -16,7 +16,7 @@ from ultralytics import YOLO
 
 drive.mount("/content/drive")
 
-Configuration of the file AND folder
+### Configuration of the file AND folder
 
 ZIP_PATH = "/content/drive/MyDrive/Roboflow/Suspicious Detection.yolov8.zip"
 
@@ -41,7 +41,7 @@ CLASS_NAMES = {
 5: "Violance"
 }
 
-Checking GPU
+### Checking GPU
 
 if torch.cuda.is_available():
 DEVICE = 0
@@ -50,7 +50,7 @@ else:
 DEVICE = "cpu"
 print("GPU not found. Training will run on CPU.")
 
-Copy with Unzip dataset
+### Copy with Unzip dataset
 
 if not os.path.exists(ZIP_PATH):
 raise FileNotFoundError(f"ZIP not found: {ZIP_PATH}")
@@ -69,14 +69,14 @@ z.extractall(DATASET_ROOT)
 
 print("Unzip done.")
 
-Checking the dataset structure
+### Checking the dataset structure
 
 for root, dirs, files in os.walk(DATASET_ROOT):
 level = root.replace(str(DATASET_ROOT), "").count(os.sep)
 if level <= 2:
 print(" " \* level + os.path.basename(root) + "/")
 
-create the Valid split from Train
+### create the Valid split from Train
 
 train_img_dir = DATASET_ROOT / "train" / "images"
 train_lbl_dir = DATASET_ROOT / "train" / "labels"
@@ -124,7 +124,7 @@ print("Validation split created.")
 print("Train images:", len(list(train*img_dir.glob("*._"))))
 print("Valid images:", len(list(valid_img_dir.glob("_.\_"))))
 
-Fix data.yml
+### Fix data.yml
 
 DATA_YAML = DATASET_ROOT / "data.yaml"
 
@@ -145,7 +145,7 @@ DATA_YAML.write_text(content)
 print("Final data.yaml:")
 print(DATA_YAML.read_text())
 
-Checxk Label Format
+### Check Label Format
 
 sample_labels = list((DATASET_ROOT / "train" / "labels").glob("\*.txt"))[:10]
 
@@ -170,7 +170,7 @@ lines = [x.strip() for x in f.readlines() if x.strip()]
             print("Unknown label format.")
         break
 
-Train YOLOv8
+### Train YOLOv8
 
 os.makedirs(DRIVE_PROJECT_DIR, exist_ok=True)
 
@@ -193,7 +193,7 @@ verbose=True,
 exist_ok=True
 )
 
-Validate Best Model
+### Validate Best Model
 
 best_ckpt = Path(DRIVE_PROJECT_DIR) / RUN_NAME / "weights" / "best.pt"
 
@@ -204,7 +204,7 @@ print("Validation complete.")
 else:
 print("best.pt not found.")
 
-Test prediction
+### Test prediction
 
 best_ckpt = Path(DRIVE_PROJECT_DIR) / RUN_NAME / "weights" / "best.pt"
 best_model = YOLO(str(best_ckpt))
@@ -225,7 +225,7 @@ save=True
 print("Prediction done.")
 print("Sample image:", sample_img)
 
-Show result Folder
+### Show result Folder
 
 print("Training result folder:")
 print(Path(DRIVE_PROJECT_DIR) / RUN_NAME)
