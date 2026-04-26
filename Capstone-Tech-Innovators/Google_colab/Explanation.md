@@ -333,16 +333,21 @@ if level <= 2:
 
 - Prints structure (only first few levels)
 
-### Expected structure
+### Lets Visualizing the structure:
 
 ```
-train/
-  images/
-  labels/
-valid/
-  images/
-  labels/
+/dataset (Level 0)
+├── train (Level 1)
+│   ├── images (Level 2)
+│   │   ├── img1.jpg (Level 3 - Hidden)
+│   │   └── img2.jpg (Level 3 - Hidden)
+│   └── labels (Level 2)
+└── val (Level 1)
 ```
+
+    The print command will trigger for the folders, but it won't trigger for the deep nested files or any sub-folders deeper than level 2.
+
+This is a best practice when `handling large computer vision datasets`. Since a typical dataset might `contain 50,000+ images`, you only want to see a high-level summary (e.g., "Found the train/images folder") `rather than a printout of every single file path`.
 
 ---
 
