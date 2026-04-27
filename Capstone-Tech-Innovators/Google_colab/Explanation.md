@@ -379,6 +379,12 @@ for ext in image_exts:
 
 ---
 
+- `Handling Multiple Formats`: Machine learning datasets often contain a mix of formats (like .jpg, .png, and .jpeg). By iterating through image_exts, you ensure the script doesn't miss valid data just because of a file extension.
+- `Pathlib's Advantages`: Using .glob() on a Path object is generally more readable than the older `os.listdir` or `glob.glob` modules. It returns `Path objects directly`, which makes `subsequent operations—like` getting the `filename without the extension` or `moving the file—much simpler`.
+- `List Extension`: The `.extend()` method is the right choice here. It `flattens (thin)` the results `into a single list of images` rather than `creating a list of lists`, which would happen if you used `.append()`.
+
+---
+
 ```python
 random.shuffle(images)
 ```
@@ -413,8 +419,8 @@ shutil.move(...)
 
 ### Concept
 
-- Train set → model learns
-- Validation set → model is tested during training
+- `Train set` → model learns
+- `Validation set` → model is tested during training
 
 ---
 
@@ -451,8 +457,8 @@ DATA_YAML.write_text(content)
 
 YOLO reads this file to:
 
-- know where images are
-- know class names
+- `know where images are`
+- `know class names`
 
 ---
 
@@ -474,13 +480,19 @@ lines = [x.strip() for x in f.readlines()]
 
 ---
 
+By using a list comprehension with `strip()`, you’re accomplishing two things at once:
+
+- `Cleaning the Data`: It removes the newline character (\n) from the end of each line and any accidental leading/trailing whitespace. This is crucial because `a trailing space could cause an error` when you `try to convert a coordinate string into a float or an integer`.
+
+- `Memory Management`: `readlines()` reads the entire file into memory at once. For label files, which are typically small (just a few lines of coordinates), this is very efficient.
+
+---
+
 ### YOLO format
 
 Each line:
 
-```
-class x_center y_center width height
-```
+`class`` x_center` `y_center` `width` `height`
 
 Total = 5 values
 
@@ -558,11 +570,31 @@ best_ckpt = Path(...) / "best.pt"
 
 ---
 
+This defines the path to the most important output of your training run. In the YOLO ecosystem, `best.pt` is the checkpoint that achieved the `highest` `mAP (Mean Average Precision)` or the `lowest validation loss` during the `entire process`, as opposed to `last.pt`, which is `just the state of the model at the final epoch`.
+
+Using `pathlib` here is a smart choice for a few reasons:
+
+- `Platform Independence`: Using the `/ operator` to join paths ensures that your script will work whether it's running on a `Windows machine` (using `backslashes`) or a `Linux/Colab environment` (using `forward slashes`).
+- `Ready for Verification`: Since it's a Path object, you can immediately run `if best_ckpt.exists():` before trying to load it for inference or deployment, which prevents "`File Not Found`" crashes.
+- `Clear Downstream Usage`: Having this path stored in a variable makes it easy to later move the file to a `weights/ directory or export it to another format like ONNX or TensorRT`.
+
+---
+
 ```python
 best_model = YOLO(str(best_ckpt))
 ```
 
 - Load trained model
+
+---
+
+This line initializes the model for the next phase, whether that is validation, inference, or exporting. By passing the string representation of your best.pt path to the YOLO class, you are loading the specific weights that performed best during training.
+
+    A few technical details to note about this step:
+
+- `String Conversion`: Using `str(best_ckpt)` is often necessary because, while `pathlib` is great for `path manipulation`, some underlying libraries (including certain versions of the `Ultralytics framework`) still expect a `standard string` rather than `a Path object`.
+- `Model Reconstruction`: When you load a `.pt file` this way, `the YOLO class doesn't just load the weights`; it also `reconstructs the model architecture and hyperparameter settings stored within the checkpoint`.
+- `Ready for Action`: Once this `line executes`, `best_model is a fully functional object`. You can immediately `run best_model.predict(), best_model.val(), or best_model.export(format="onnx")`.
 
 ---
 
@@ -576,7 +608,7 @@ metrics = best_model.val(...)
 
 ### Metrics include
 
-- mAP (accuracy)
+- mAP [Mean Average Precision] (accuracy)
 - precision
 - recall
 
@@ -603,6 +635,13 @@ conf=0.25
 
 - Confidence threshold
 - Lower = more detections
+
+---
+
+In `YOLO (You Only Look Once)`,
+
+- [ The `confidence threshold` is a `filtering mechanism` that determines which `object detections are considered valid` and `displayed to the user`. ] ( কনফিডেন্স থ্রেশহোল্ড হলো একটি ফিল্টারিং ব্যবস্থা যা নির্ধারণ করে কোন অবজেক্ট ডিটেকশনগুলোকে বৈধ বলে গণ্য করা হবে এবং ব্যবহারকারীকে দেখানো হবে। )
+- [ It is a `value` `between 0 and 1` that `represents the minimum score a model must assign to a predicted bounding box for it to be accepted`. ] ( এটি ০ থেকে ১-এর মধ্যে একটি মান, যা সেই সর্বনিম্ন স্কোরকে বোঝায় যা একটি মডেলকে অবশ্যই একটি পূর্বাভাসিত বাউন্ডিং বক্সকে প্রদান করতে হবে, যাতে সেটি গৃহীত হয়। )
 
 ---
 
@@ -677,17 +716,3 @@ After this explanation, you should clearly know:
 - difference between train and validation
 
 ---
-
-Now we can go deeper.
-
-When you're ready, tell me:
-"I want to understand YOLOv8 architecture"
-
-Then I’ll break down:
-
-- backbone
-- neck
-- head
-- how detection actually works internally
-
-step by step, from zero level to research-level understanding.
